@@ -1,44 +1,36 @@
-name: Safe Auto Commit Changes
-
-on:
-  push:
-    branches: [main]
-  workflow_dispatch:         # Allow manual run from GitHub UI
-  schedule:
-    - cron: '0 * * * *'      # Optional: run once every hour
-
-jobs:
-  auto-commit:
-    if: github.actor != 'github-actions[bot]'  # 🚫 Prevent loop
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: ⬇️ Checkout Repo
-        uses: actions/checkout@v4
-        with:
-          persist-credentials: false  # Required for safer push action
-
-      - name: 🛠 Setup Git Identity
-        run: |
-          git config --global user.name "RapidFlashUSDT Bot"
-          git config --global user.email "bot@flashusdtsender.xyz"
-
-      - name: 🚧 Safe File Update (example only)
-        run: |
-          mkdir -p logs
-          echo "Last sync: $(date -u)" >> logs/auto-sync.log
-
-      - name: ✅ Check for Actual Changes
-        id: check_changes
-        run: |
-          git add .
-          git diff --cached --quiet && echo "no_changes=true" >> $GITHUB_OUTPUT || echo "no_changes=false" >> $GITHUB_OUTPUT
-
-      - name: ✅ Commit and Push if Changed
-        if: steps.check_changes.outputs.no_changes == 'false'
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "🤖 Safe Auto-commit: $(date -u +'%Y-%m-%d %H:%M UTC')"
-          branch: main
-          commit_user_name: RapidFlashUSDT Bot
-          commit_user_email: bot@flashusdtsender.xyz
+v5
+Started: bash /home/runner/work/_actions/stefanzweifel/git-auto-commit-action/v5/entrypoint.sh
+INPUT_REPOSITORY value: .
+INPUT_STATUS_OPTIONS: 
+INPUT_FILE_PATTERN: .
+INPUT_BRANCH value: main
+Already on 'main'
+A	logs/auto-sync.log
+Your branch is up to date with 'origin/main'.
+INPUT_ADD_OPTIONS: 
+INPUT_FILE_PATTERN: .
+INPUT_COMMIT_OPTIONS: 
+INPUT_COMMIT_USER_NAME: RapidFlashUSDT Bot
+INPUT_COMMIT_USER_EMAIL: bot@flashusdtsender.xyz
+INPUT_COMMIT_MESSAGE: 🤖 Safe Auto-commit: $(date -u +'%Y-%m-%d %H:%M UTC')
+INPUT_COMMIT_AUTHOR: droptonotify <200741315+droptonotify@users.noreply.github.com>
+[main e24e5dc] 🤖 Safe Auto-commit: $(date -u +'%Y-%m-%d %H:%M UTC')
+ Author: droptonotify <200741315+droptonotify@users.noreply.github.com>
+ 1 file changed, 1 insertion(+)
+ create mode 100644 logs/auto-sync.log
+INPUT_TAGGING_MESSAGE: 
+No tagging message supplied. No tag will be added.
+INPUT_PUSH_OPTIONS: 
+fatal: could not read Username for 'https://github.com': No such device or address
+Error: Invalid status code: 128
+    at ChildProcess.<anonymous> (/home/runner/work/_actions/stefanzweifel/git-auto-commit-action/v5/index.js:17:19)
+    at ChildProcess.emit (node:events:524:28)
+    at maybeClose (node:internal/child_process:1104:16)
+    at ChildProcess._handle.onexit (node:internal/child_process:304:5) {
+  code: 128
+}
+Error: Invalid status code: 128
+    at ChildProcess.<anonymous> (/home/runner/work/_actions/stefanzweifel/git-auto-commit-action/v5/index.js:17:19)
+    at ChildProcess.emit (node:events:524:28)
+    at maybeClose (node:internal/child_process:1104:16)
+    at ChildProcess._handle.onexit (node:internal/child_process:304:5)
