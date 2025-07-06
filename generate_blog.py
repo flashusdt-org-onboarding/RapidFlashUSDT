@@ -18,19 +18,13 @@ def generate(topic: str):
 
     # ✅ Timestamp + file setup
     date_str = datetime.now().strftime("%Y-%m-%d")
-    slug = slugify(topic)
+    slug = slugify(str(topic))
     filename = f"blogs/{date_str}-{slug}.mdx"
     os.makedirs("blogs", exist_ok=True)
 
     # ✅ Gemini prompt contents
     contents = [
-        types.Content(role="user", parts=[types.Part.from_text("How to use?")]),
-        types.Content(role="model", parts=[
-            types.Part.from_text("Analyzing the prompt and preparing MDX blog structure...")
-        ]),
-        types.Content(role="user", parts=[
-            types.Part.from_text(topic)
-        ]),
+        types.Content(role="user", parts=[types.Part.from_text(text=topic)]),
     ]
 
     # ✅ System instructions
@@ -58,7 +52,7 @@ Each blog must:
         thinking_config=types.ThinkingConfig(thinking_budget=32768),
         tools=[types.Tool(url_context=types.UrlContext())],
         response_mime_type="text/plain",
-        system_instruction=[types.Part.from_text(system_prompt)],
+        system_instruction=system_prompt,
     )
 
     print(f"🧠 Generating blog post for topic: {topic}\n💾 Saving to: {filename}\n")
