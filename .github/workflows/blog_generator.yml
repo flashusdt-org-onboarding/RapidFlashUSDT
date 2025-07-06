@@ -1,0 +1,50 @@
+name: Blog Generator
+
+on:
+  schedule:
+    - cron: '0 */2 * * *'
+
+jobs:
+  generate_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install google-genai python-dotenv slugify
+
+      - name: Set Gemini API key
+        run: echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" > .env
+
+      - name: Generate blog post
+        run: python generate_blog.py "Automated Blog Post"
+
+      - name: List blog files
+        run: ls blogs/ > blog_list.txt
+
+      - name: Update index.html
+        run: |
+          BLOG_FILES=$(cat blog_list.txt)
+          echo "$BLOG_FILES"
+          HTML_CONTENT="<!DOCTYPE html><html><head><title>FlashUSDT Blogs</title></head><body><h1>FlashUSDT Blogs</h1><ul>"
+          for FILE in $BLOG_FILES; do
+            HTML_CONTENT+='<li><a href="blogs/'"$FILE"' ">'"$FILE"'</a></li>'
+          done
+          HTML_CONTENT+="</ul></body></html>"
+          echo -e "$HTML_CONTENT" > index.html
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git add .
+          git commit -m "Automate blog generation and update index.html"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
