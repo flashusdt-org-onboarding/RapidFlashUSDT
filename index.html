@@ -4,79 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="https://flashusdtsender.xyz/favicon.ico" type="image/x-icon">
-    <title>FlashUSDT Blogs</title>
-    <meta name="description" content="Latest FlashUSDT blogs on crypto payments, automation, and wallet APIs.">
-    <meta name="keywords" content="FlashUSDT, crypto payments, USDT, automation, wallet API">
-    <style>
-        /* CSS Reset */
-        body, h1, ul, li, a {
-            margin: 0;
-            padding: 0;
-            border: 0;
-            font-size: 100%;
-            font: inherit;
-            vertical-align: baseline;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-            margin: 20px;
-        }
-        h1 {
-            color: #333;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        li {
-            margin-bottom: 10px;
-        }
-        a {
-            text-decoration: none;
-            color: #007bff;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <title>FlashUSDT: Crypto Payment Solutions, Automation & Wallet APIs - Blogs</title>
+    <meta name="description" content="Explore the latest FlashUSDT blogs on crypto payments, USDT automation, and wallet APIs. Learn how to integrate crypto payments into your business.">
+    <meta name="keywords" content="FlashUSDT, crypto payments, USDT, cryptocurrency, automation, wallet API, blockchain, payment gateway">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <a href="https://flashusdtsender.xyz" target="_blank">Visit FlashUSDT</a>
-<body>
-    <h1>FlashUSDT Blogs</h1>
-    <ul>
-        <!-- Blog list will be dynamically generated here -->
-    </ul>
-    <script>
-        // JavaScript to dynamically generate the blog list
-        const blogList = document.querySelector('ul');
-        const blogsDirectory = 'blogs/';
-
-        // Function to fetch the list of files in the blogs directory
-        async function getBlogFiles() {
-            try {
-                // Replace this with your actual method to fetch the file list
-                // Fetch the list of blog files from the /list_blogs endpoint
-                const response = await fetch('/list_blogs');
-                const files = await response.json();
-
-                files.forEach(file => {
-                    const listItem = document.createElement('li');
-                    const link = document.createElement('a');
-                    link.href = blogsDirectory + file;
-                    link.textContent = file;
-                    listItem.appendChild(link);
-                    blogList.appendChild(listItem);
-                });
-            } catch (error) {
-                console.error('Error fetching blog files:', error);
-                blogList.textContent = 'Error: Could not load blog list.';
-            }
-        }
-
-        // Call the function to generate the blog list
-        getBlogFiles();
-    </script>
+    <div class="container">
+        <a href="https://flashusdtsender.xyz" target="_blank" class="flashusdt-link">Visit FlashUSDT</a>
+        <h1>FlashUSDT Blogs</h1>
+        <main>
+            <ul>
+                <!-- Blog list will be dynamically generated here -->
+            </ul>
+        </main>
+    </div>
+    <script src="js/script.js"></script>
 </body>
 </html>
