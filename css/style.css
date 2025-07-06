@@ -12,9 +12,15 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     margin: 20px;
 }
+
+/* Heading Styles */
 h1 {
     color: #333;
+    text-align: center; /* Center the heading */
+    margin-bottom: 30px;
 }
+
+/* List Styles */
 ul {
     list-style-type: none;
     padding: 0;
@@ -22,6 +28,8 @@ ul {
 li {
     margin-bottom: 10px;
 }
+
+/* Link Styles */
 a {
     text-decoration: none;
     color: #007bff;
@@ -30,11 +38,19 @@ a:hover {
     text-decoration: underline;
 }
 
-/* Basic container for responsiveness */
+/* Container Styles */
 .container {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
+}
+
+/* FlashUSDT Link Styles */
+.flashusdt-link {
+    display: block;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.2em;
 }
 
 /* Media query for smaller screens */
@@ -46,9 +62,6 @@ a:hover {
         font-size: 1.5em;
     }
     .flashusdt-link {
-        display: block;
-        text-align: center;
-        margin-bottom: 20px;
-        font-size: 1.2em;
+        font-size: 1em; /* Adjust font size for smaller screens */
     }
 }

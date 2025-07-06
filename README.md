@@ -11,7 +11,7 @@
 
 ## 📋 Overview
 
-RapidFlashUSDT Enterprise Platform is a cutting-edge payment processing solution designed to facilitate instant USDT (Tether) transactions with lightning-fast settlement times. Built for enterprises who need reliable, scalable cryptocurrency payment integration.
+RapidFlashUSDT Enterprise Platform is a payment processing solution for instant USDT transactions. Built for enterprises who need reliable, scalable cryptocurrency payment integration.
 
 ### ✨ Key Features
 
@@ -51,11 +51,28 @@ RapidFlashUSDT Enterprise Platform is a cutting-edge payment processing solution
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ 
+- Node.js 18+
 - Enterprise access key (contact sales)
-- Production environment setup
 
-### Installation
+### Installation (Development)
+
+\`\`\`bash
+# Clone the repository
+git clone https://github.com/flashusdt-org-onboarding/RapidFlashUSDT.git
+cd RapidFlashUSDT
+
+# Install dependencies
+npm install
+
+# Configure environment
+cp .env.template .env.local
+# Add your enterprise credentials to .env.local
+
+# Start development server
+npm run dev
+\`\`\`
+
+### Installation (Production)
 
 \`\`\`bash
 # Clone the enterprise repository
@@ -69,8 +86,11 @@ npm install
 cp .env.template .env.local
 # Add your enterprise credentials
 
-# Start development server
-npm run dev
+# Build for production
+npm run build
+
+# Start production server
+npm start
 \`\`\`
 
 ### Enterprise SDK Integration
@@ -99,26 +119,9 @@ console.log(`Transaction completed: ${transaction.hash}`)
 
 ## 🏗️ Architecture
 
-\`\`\`
-┌─────────────────────────────────────────────────────────────┐
-│                    RapidFlashUSDT Enterprise                │
-├─────────────────────────────────────────────────────────────┤
-│  Frontend (Next.js 14)     │  Backend (Node.js/Fastify)    │
-│  ├── Enterprise Dashboard  │  ├── Authentication Service   │
-│  ├── Analytics Portal      │  ├── Transaction Engine       │
-│  ├── Admin Interface       │  ├── Blockchain Connectors    │
-│  └── Mobile App            │  └── Webhook Delivery         │
-├─────────────────────────────────────────────────────────────┤
-│                    Security Layer                           │
-│  ├── Rate Limiting         │  ├── Encryption at Rest       │
-│  ├── DDoS Protection       │  ├── Key Management (HSM)     │
-│  ├── Fraud Detection       │  └── Audit Logging            │
-├─────────────────────────────────────────────────────────────┤
-│                   Blockchain Networks                       │
-│  ├── Ethereum (USDT-ERC20) │  ├── Tron (USDT-TRC20)       │
-│  ├── BSC (USDT-BEP20)      │  └── Polygon (USDT-PoS)      │
-└─────────────────────────────────────────────────────────────┘
-\`\`\`
+[Architecture Diagram](https://example.com/architecture.png)
+
+*Note: The architecture diagram is a placeholder. A real diagram will be added soon.*
 
 ## 📈 Performance Metrics
 
