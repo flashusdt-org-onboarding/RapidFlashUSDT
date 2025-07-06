@@ -8,13 +8,16 @@ from slugify import slugify
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
+from flask import Flask, jsonify
 
 load_dotenv()
+
+app = Flask(__name__)
 
 def generate(topic: str):
     # ✅ Initialize client
     client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-    model = "gemini-2.5-pro"
+    model = "gemini-2.0-pro-005"
 
     # ✅ Timestamp + file setup
     date_str = datetime.now().strftime("%Y-%m-%d")
@@ -59,18 +62,42 @@ Each blog must:
     print(f"🧠 Generating blog post for topic: {topic}\n💾 Saving to: {filename}\n")
 
     with open(filename, "w", encoding="utf-8") as f:
-        for chunk in client.models.generate_content_stream(
-            model=model,
-            contents=contents,
-            config=config,
-        ):
-            print(chunk.text, end="")
-            f.write(chunk.text)
+        try:
+            for chunk in client.models.generate_content_stream(
+                model=model,
+                contents=contents,
+                config=config,
+            ):
+                print(chunk.text, end="")
+                f.write(chunk.text)
 
-    print(f"\n✅ Blog generated: {filename}")
+            print(f"\n✅ Blog generated: {filename}")
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate MDX blog using Gemini 2.5 Pro for FlashUSDT.")
-    parser.add_argument("topic", type=str, help="Blog topic title, e.g. 'Building Wallet APIs with FlashUSDT'")
+        except Exception as e:
+            print(f"❌ Error generating blog post: {e}")
+
+def main():
+    parser = argparse.ArgumentParser(description="Generate MDX blog using Gemini 2.0 Pro for FlashUSDT.")
+    parser.add_argument("topic", type=str, nargs='?', default="FlashUSDT", help="Blog topic title, e.g. 'Building Wallet APIs with FlashUSDT'")
     args = parser.parse_args()
     generate(args.topic)
+
+@app.route('/list_blogs')
+def list_blogs():
+    try:
+        blogs = [f for f in os.listdir('blogs') if f.endswith('.mdx')]
+        return jsonify(blogs)
+    except Exception as e:
+        print(f"❌ Error listing blogs: {e}")
+        return jsonify({"error": str(e)}), 500
+
+def create_app():
+    return app
+
+if __name__ == "__main__":
+    # Check if a topic is provided as a command-line argument
+    if len(os.sys.argv) > 1:
+        main()
+    else:
+        app = create_app()
+        app.run(debug=True)
