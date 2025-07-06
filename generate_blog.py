@@ -1,119 +1,81 @@
-# To run this code you need to install the following dependencies:
-# pip install google-genai
+# generate_blog.py
+# Requires: pip install google-genai python-dotenv
 
-import base64
 import os
+import argparse
+from datetime import datetime
+from slugify import slugify
 from google import genai
 from google.genai import types
-import os
-import re
-import requests
-import yaml
-from bs4 import BeautifulSoup
-from datetime import datetime
-from google.generativeai import GenerativeModel, configure
+from dotenv import load_dotenv
 
-# ✅ Load configuration
-try:
-    with open("config.yml", "r") as f:
-        config = yaml.safe_load(f)
-except FileNotFoundError:
-    print("❌ Error: config.yml not found. Please create it.")
-    exit(1)
-except yaml.YAMLError as e:
-    print(f"❌ Error parsing config.yml: {e}")
-    exit(1)
+load_dotenv()
 
-URL = config.get("site_url")
-TOPICS = config.get("topics", [])
-OUTPUT_DIR = config.get("output_dir", "blogs")
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+def generate(topic: str):
+    # ✅ Initialize client
+    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+    model = "gemini-2.5-pro"
 
-# ✅ Validate essential configuration
-if not URL or not TOPICS:
-    print("❌ Error: 'site_url' and 'topics' must be defined in config.yml.")
-    exit(1)
+    # ✅ Timestamp + file setup
+    date_str = datetime.now().strftime("%Y-%m-%d")
+    slug = slugify(topic)
+    filename = f"blogs/{date_str}-{slug}.mdx"
+    os.makedirs("blogs", exist_ok=True)
 
-if not GEMINI_API_KEY:
-    print("❌ Error: GEMINI_API_KEY environment variable not set.")
-    exit(1)
+    # ✅ Gemini prompt contents
+    contents = [
+        types.Content(role="user", parts=[types.Part.from_text("How to use?")]),
+        types.Content(role="model", parts=[
+            types.Part.from_text("Analyzing the prompt and preparing MDX blog structure...")
+        ]),
+        types.Content(role="user", parts=[
+            types.Part.from_text(topic)
+        ]),
+    ]
 
-# ✅ Configure Gemini using the correct model ID
-try:
-    configure(api_key=GEMINI_API_KEY)
-    model = GenerativeModel("models/gemini-pro")  # ← fixed 404
-except Exception as e:
-    print(f"❌ Failed to configure Gemini: {e}")
-    exit(1)
+    # ✅ System instructions
+    system_prompt = """
+You are an expert crypto content writer and developer advocate for **FlashUSDT**, a secure, lightning-fast USDT payment automation platform.
 
-# ✅ Scrape content from the FlashUSDT landing page
-print(f"Fetching content from {URL}...")
-try:
-    response = requests.get(URL, timeout=15)
-    response.raise_for_status()  # Raises an HTTPError for bad responses (4xx or 5xx)
-    soup = BeautifulSoup(response.text, "html.parser")
-    # A more robust way to gather text from meaningful tags
-    page_text = ' '.join(tag.get_text(separator=" ", strip=True) for tag in soup.find_all(['h1', 'h2', 'h3', 'p', 'li', 'span']))
-    page_text = re.sub(r"\s+", " ", page_text).strip()[:5000] # Limit context size
-    if not page_text:
-        print("⚠️ Warning: Could not find any text content on the page. Blog quality may be affected.")
-except requests.exceptions.RequestException as e:
-    print(f"❌ Failed to fetch URL: {e}")
-    exit(1)
-except Exception as e:
-    print(f"❌ Failed to parse URL content: {e}")
-    exit(1)
+Your task is to write professional, SEO-optimized, Markdown+JSX (`.mdx`) blog articles to be published at:
 
-# ✅ Generate blog posts for each topic
-os.makedirs(OUTPUT_DIR, exist_ok=True)
-timestamp = datetime.utcnow().strftime("%Y-%m-%d")
+🌐 https://flashusdtsender.xyz  
+📦 https://github.com/flashusdt-org-onboarding/RapidFlashUSDT  
+📄 https://flashusdtsender.xyz/docs  
+🔧 https://flashusdtsender.xyz/api  
+💬 https://t.me/RapidFlashUSDT
 
-print(f"\nGenerating {len(TOPICS)} blog posts...")
-for topic in TOPICS:
-    print(f"  - Working on topic: '{topic}'")
-    prompt = (
-        f"Using the following content scraped from a website as context:\n\n---\n{page_text}\n---\n\n"
-        f"Write a professional, high-quality, SEO-optimized blog post of approximately 800 words on the topic: '{topic}'.\n\n"
-        f"The blog post must:\n"
-        f"- Be written in clear, engaging, and professional English.\n"
-        f"- Be formatted in Markdown, using headings (##), subheadings (###), and bullet points (-) for readability.\n"
-        f"- Naturally incorporate relevant keywords such as: USDT, crypto payments, automation, API, wallet integration, security, digital finance.\n"
-        f"- Start with a compelling introduction and end with a strong conclusion.\n"
-        f"- Include a final call-to-action that encourages readers to visit the official site (do not include a placeholder URL, just mention the service name)."
+Each blog must:
+1. Use `.mdx` format with YAML frontmatter
+2. Be < 1000 words
+3. Use components: `<CallToAction />`, `<FeatureList />`, `<CodeBlock />`
+4. End with a CTA block
+5. Use real URLs, code examples, and proper structure
+6. Focus on USDT, crypto payments, automation, wallet API, etc.
+    """.strip()
+
+    config = types.GenerateContentConfig(
+        thinking_config=types.ThinkingConfig(thinking_budget=32768),
+        tools=[types.Tool(url_context=types.UrlContext())],
+        response_mime_type="text/plain",
+        system_instruction=[types.Part.from_text(system_prompt)],
     )
 
-    try:
-        # Generate content with safety settings to avoid blocked prompts for business topics
-        generation_config = {"temperature": 0.7}
-        safety_settings = {
-            "HARM_CATEGORY_HARASSMENT": "BLOCK_NONE",
-            "HARM_CATEGORY_HATE_SPEECH": "BLOCK_NONE",
-            "HARM_CATEGORY_SEXUALLY_EXPLICIT": "BLOCK_NONE",
-            "HARM_CATEGORY_DANGEROUS_CONTENT": "BLOCK_NONE",
-        }
-        
-        result = model.generate_content(
-            prompt,
-            generation_config=generation_config,
-            safety_settings=safety_settings
-        )
-        
-        # Clean up the response text from potential markdown artifacts
-        blog_content = result.text.strip()
-        if blog_content.lower().startswith("markdown"):
-            blog_content = blog_content[len("markdown"):].strip()
+    print(f"🧠 Generating blog post for topic: {topic}\n💾 Saving to: {filename}\n")
 
-        slug = topic.lower().replace(" ", "-").replace("/", "-").replace("'", "")
-        filename = f"{OUTPUT_DIR}/{timestamp}-{slug}.md"
+    with open(filename, "w", encoding="utf-8") as f:
+        for chunk in client.models.generate_content_stream(
+            model=model,
+            contents=contents,
+            config=config,
+        ):
+            print(chunk.text, end="")
+            f.write(chunk.text)
 
-        with open(filename, "w", encoding="utf-8") as f:
-            f.write(blog_content)
+    print(f"\n✅ Blog generated: {filename}")
 
-        print(f"    ✅ Blog saved successfully: {filename}")
-
-    except Exception as e:
-        print(f"    ❌ Failed to generate or save blog for '{topic}': {e}")
-        # Continue to the next topic instead of exiting
-        continue
-
-print("\n✨ Blog generation process complete.")
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Generate MDX blog using Gemini 2.5 Pro for FlashUSDT.")
+    parser.add_argument("topic", type=str, help="Blog topic title, e.g. 'Building Wallet APIs with FlashUSDT'")
+    args = parser.parse_args()
+    generate(args.topic)
