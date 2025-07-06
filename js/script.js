@@ -1,6 +1,7 @@
 // JavaScript to dynamically generate the blog list
 // Get the blog list element
-const blogList = document.querySelector('ul');
+const blogList = document.getElementById('blog-list');
+const noBlogsMessage = document.getElementById('no-blogs-message');
 const blogsDirectory = 'blogs/';
 
 // Function to fetch the list of files in the blogs directory
@@ -20,14 +21,18 @@ async function getBlogFiles() {
         blogList.textContent = '';
 
         // Iterate over the files and create list items
-        files.forEach(file => {
-            const listItem = document.createElement('li');
-            const link = document.createElement('a');
-            link.href = blogsDirectory + file;
-            link.textContent = file;
-            listItem.appendChild(link);
-            blogList.appendChild(listItem);
-        });
+        if (files.length === 0) {
+            noBlogsMessage.style.display = 'block';
+        } else {
+            files.forEach(file => {
+                const listItem = document.createElement('li');
+                const link = document.createElement('a');
+                link.href = blogsDirectory + file;
+                link.textContent = file;
+                listItem.appendChild(link);
+                blogList.appendChild(listItem);
+            });
+        }
     } catch (error) {
         console.error('Error fetching blog files:', error);
         blogList.textContent = `Error: Could not load blog list. ${error}`;
