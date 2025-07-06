@@ -31,7 +31,8 @@ def generate(topic: str):
     system_prompt = """
 You are an expert crypto content writer and developer advocate for **FlashUSDT**, a secure, lightning-fast USDT payment automation platform.
 
-Your task is to write professional, SEO-optimized, Markdown+JSX (`.mdx`) blog articles to be published at:
+Your task is to write highly professional, SEO-optimized, Markdown+JSX (`.mdx`) blog articles to be published at:
+Each article should have a title, meta description, keywords, and internal links.
 
 🌐 https://flashusdtsender.xyz  
 📦 https://github.com/flashusdt-org-onboarding/RapidFlashUSDT  
