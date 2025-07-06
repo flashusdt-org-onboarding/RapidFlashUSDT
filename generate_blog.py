@@ -8,15 +8,8 @@ from slugify import slugify
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
-import os
-import argparse
+from flask import Flask, jsonify, send_from_directory
 import logging
-from datetime import datetime
-from slugify import slugify
-from google import genai
-from google.genai import types
-from dotenv import load_dotenv
-from flask import Flask, jsonify
 
 load_dotenv()
 
@@ -52,8 +45,7 @@ def generate(topic: str):
 You are an expert crypto content writer and developer advocate for **FlashUSDT**, a secure, lightning-fast USDT payment automation platform.
 
 Your task is to write highly professional, SEO-optimized, Markdown+JSX (`.mdx`) blog articles to be published at:
-Each article should have a title, meta description, keywords, and internal links.
-
+Each article should have a title, meta description, keywords, and internal links. The meta description should be concise and engaging, and the keywords should be relevant to the topic.
 🌐 https://flashusdtsender.xyz
 📦 https://github.com/flashusdt-org-onboarding/RapidFlashUSDT
 📄 https://flashusdtsender.xyz/docs
@@ -66,8 +58,32 @@ Each blog must:
 3. Use components: `<CallToAction />`, `<FeatureList />`, `<CodeBlock />`
 4. End with a CTA block
 5. Use real URLs, code examples, and proper structure
-6. Focus on USDT, crypto payments, automation, wallet API, etc.
+6. Focus on USDT, crypto payments, automation, wallet API, etc. Incorporate the keywords naturally within the content.
     """.strip()
+
+    # Generate meta description and keywords
+    meta_description_prompt = f"Generate a concise meta description for the blog post: {topic}"
+    keywords_prompt = f"Generate 5 relevant keywords for the blog post: {topic}"
+
+    meta_description = client.models.generate_content(
+        model=model,
+        contents=[types.Content(role="user", parts=[types.Part.from_text(text=meta_description_prompt)])],
+        config=config,
+    ).text.strip()
+
+    keywords = client.models.generate_content(
+        model=model,
+        contents=[types.Content(role="user", parts=[types.Part.from_text(text=keywords_prompt)])],
+        config=config,
+    ).text.strip()
+
+    # YAML frontmatter
+    frontmatter = f"""---
+title: {topic}
+description: {meta_description}
+keywords: {keywords}
+---
+""".strip()
 
     config = types.GenerateContentConfig(
         thinking_config=types.ThinkingConfig(thinking_budget=32768),
@@ -80,6 +96,8 @@ Each blog must:
 
     with open(filename, "w", encoding="utf-8") as f:
         try:
+            f.write(frontmatter + "\n\n")
+
             for chunk in client.models.generate_content_stream(
                 model=model,
                 contents=contents,
@@ -89,7 +107,6 @@ Each blog must:
                 print(chunk.text, end="")
 
             logging.info(f"Blog generated successfully: {filename}")
-
         except Exception as e:
             logging.exception(f"Error generating blog post: {e}")
 
@@ -111,14 +128,14 @@ def list_blogs():
         logging.exception(f"Error listing blogs: {e}")
         return jsonify({"error": str(e)}), 500
 
+@app.route('/')
+def index():
+    return send_from_directory('.', 'index.html')
+
 def create_app():
     return app
 
 if __name__ == "__main__":
-    # Check if a topic is provided as a command-line argument
-    if len(os.sys.argv) > 1:
-        main()
-    else:
-        # Don't run in debug mode in production
-        app = create_app()
-        app.run(debug=False)
+    # Always run the Flask app
+    app = create_app()
+    app.run(debug=False, port=5002)

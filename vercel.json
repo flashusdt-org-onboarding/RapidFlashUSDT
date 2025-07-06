@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/b6a6cddf10084c568e43b72a985bc14c.txt", "destination": "/b6a6cddf10084c568e43b72a985bc14c.txt" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

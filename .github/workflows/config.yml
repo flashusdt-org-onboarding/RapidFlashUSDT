@@ -3,7 +3,7 @@ name: Weekly Gemini Blog Engine
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 2 * * 1'  # Every Monday at 2:00 UTC
+    - cron: "0 2 * * 1" # Every Monday at 2:00 UTC
 
 jobs:
   generate-blog:
@@ -16,7 +16,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install Dependencies
         run: pip install google-generativeai beautifulsoup4 pyyaml requests
