@@ -235,3 +235,13 @@ _Note: The architecture diagram is a placeholder. A real diagram will be added s
 **Made with ❤️ by the FlashUSDT Team**
 
 _Empowering the future of digital payments, one transaction at a time._
+
+## 🔎 IndexNow Integration
+
+This website supports the IndexNow protocol for fast indexing by search engines.
+
+To verify ownership of the domain, the following API key is hosted at the root of the website:
+
+-   [https://rapid-flash-usdt.vercel.app/b6a6cddf10084c568e43b72a985bc14c.txt](https://rapid-flash-usdt.vercel.app/b6a6cddf10084c568e43b72a985bc14c.txt)
+
+This key can be used to submit URLs to participating search engines for immediate indexing.
